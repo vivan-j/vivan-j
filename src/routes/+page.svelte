@@ -1,15 +1,19 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { browser } from '$app/environment';
   import SplitText from '$lib/SplitText.svelte';
   import Squares from '$lib/Squares.svelte';
 
-  gsap.registerPlugin(ScrollTrigger);
-
   let mainContent: HTMLElement;
 
-  onMount(() => {
+  onMount(async () => {
+    if (!browser) return;
+    
+    const { gsap } = await import('gsap');
+    const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+    
+    gsap.registerPlugin(ScrollTrigger);
+
     // Make content visible and animate on scroll
     gsap.set(mainContent, { opacity: 1 });
     gsap.set(mainContent.children, { opacity: 0, y: 50 });

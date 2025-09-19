@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { gsap } from 'gsap';
+  import { browser } from '$app/environment';
 
   export let text = '';
   export let tag = 'p';
@@ -8,8 +8,10 @@
 
   let element: HTMLElement;
 
-  onMount(() => {
-    if (!element || !text) return;
+  onMount(async () => {
+    if (!element || !text || !browser) return;
+
+    const { gsap } = await import('gsap');
 
     // Split text into characters
     const chars = text.split('').map((char, i) => 

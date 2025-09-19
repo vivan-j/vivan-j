@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
 
   export let direction: 'diagonal' | 'up' | 'right' | 'down' | 'left' = 'right';
   export let speed = 1;
@@ -15,6 +16,8 @@
   let hoveredSquare: { x: number; y: number } | null = null;
 
   onMount(() => {
+    if (!browser || !canvas) return;
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
