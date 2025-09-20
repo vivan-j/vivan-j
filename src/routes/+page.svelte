@@ -63,7 +63,7 @@
       <div class="project-grid">
         <div class="project-card">
           <h3>
-        <a href="https://discord.com/oauth2/authorize?client_id=1399219689548288060" target="_blank" rel="noopener noreferrer">
+        <a href="#" target="_blank" rel="noopener noreferrer">
           abcBot
         </a>
           </h3>
