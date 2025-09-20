@@ -10,6 +10,9 @@
 
   let canvas: HTMLCanvasElement;
   let animationId: number;
+  let running = true;
+  let lastFrame = 0;
+  let rafInterval = 1000 / 60; // 60fps target
   let numSquaresX = 0;
   let numSquaresY = 0;
   let gridOffset = { x: 0, y: 0 };
@@ -21,11 +24,17 @@
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    let resizeRaf: number | null = null;
     const resizeCanvas = () => {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      // Debounce to next frame to avoid thrashing
+      resizeRaf = requestAnimationFrame(() => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
       numSquaresX = Math.ceil(canvas.width / squareSize) + 1;
       numSquaresY = Math.ceil(canvas.height / squareSize) + 1;
+        resizeRaf = null;
+      });
     };
 
     const drawGrid = () => {
@@ -69,7 +78,18 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
 
-    const updateAnimation = () => {
+    const updateAnimation = (now = 0) => {
+      if (!running) {
+        animationId = requestAnimationFrame(updateAnimation);
+        return;
+      }
+      // Simple frame limiter to ~60fps
+      if (now - lastFrame < rafInterval) {
+        animationId = requestAnimationFrame(updateAnimation);
+        return;
+      }
+      lastFrame = now;
+
       const effectiveSpeed = Math.max(speed, 0.1);
       
       switch (direction) {
@@ -120,6 +140,10 @@
     };
 
     window.addEventListener('resize', resizeCanvas);
+    const handleVisibility = () => {
+      running = document.visibilityState === 'visible';
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseleave', handleMouseLeave);
     
@@ -128,6 +152,7 @@
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      document.removeEventListener('visibilitychange', handleVisibility);
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
       if (animationId) cancelAnimationFrame(animationId);
@@ -148,6 +173,6 @@
     left: 0;
     z-index: 0;
     opacity: 0.6;
-    pointer-events: auto;
+    pointer-events: none;
   }
 </style>
