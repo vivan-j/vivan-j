@@ -14,6 +14,11 @@
       description: 'An intelligent Discord bot built with Python that integrates multiple AI models, including custom fine-tuned variants for specialized tasks. Features natural language processing and task-specific AI interactions.',
       status: 'In Development'
     }
+    {
+      name: 'Game Hub'
+      url: 'math.vivanj.dev'
+      description: 'A central hub for all your favorite web based games.
+    }
   ];
 
   let currentProjectIndex = 0;
