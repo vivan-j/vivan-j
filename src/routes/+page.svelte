@@ -9,6 +9,11 @@
       description: 'A web platform that provides access to multiple AI models through a unified interface. Users can interact with different language models and compare their responses in real-time.'
     },
     {
+      name: 'Game Hub',
+      url: 'https://sharonhs.vercel.app',
+      description: 'A curated collection of browser-based games providing entertainment and interactive experiences. Features various game genres accessible from any device with a web browser.'
+    },
+    {
       name: 'abcBot',
       url: '#',
       description: 'An intelligent Discord bot built with Python that integrates multiple AI models, including custom fine-tuned variants for specialized tasks. Features natural language processing and task-specific AI interactions.',
@@ -19,35 +24,36 @@
   let currentProjectIndex = 0;
   $: currentProject = projects[currentProjectIndex];
 
+  function nextProject() {
+    currentProjectIndex = (currentProjectIndex + 1) % projects.length;
+  }
+
+  function prevProject() {
+    currentProjectIndex = (currentProjectIndex - 1 + projects.length) % projects.length;
+  }
+
   onMount(() => {
-    if (projects.length > 1) {
-      const interval = setInterval(() => {
-        currentProjectIndex = (currentProjectIndex + 1) % projects.length;
-      }, 5000);
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
 
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      }, observerOptions);
-
-      document.querySelectorAll('section').forEach(el => {
-        el.classList.add('fade-in-section');
-        observer.observe(el);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
       });
+    }, observerOptions);
 
-      return () => {
-        clearInterval(interval);
-        observer.disconnect();
-      };
-    }
+    document.querySelectorAll('section').forEach(el => {
+      el.classList.add('fade-in-section');
+      observer.observe(el);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   });
 </script>
 
@@ -57,7 +63,7 @@
   <div class="content-wrapper">
     <header class="main-header">
       <h1>Vivan Jaiswal</h1>
-      <p class="subtitle">Software Developer & Technology Enthusiast</p>
+      <p class="subtitle">Technology Enthusiast & Aspiring Software Developer</p>
     </header>
 
     <section class="about-section">
@@ -80,15 +86,27 @@
           {/if}
         </div>
         {#if projects.length > 1}
-          <div class="project-dots">
-            {#each projects as _, index}
-              <button
-                class="dot"
-                class:active={index === currentProjectIndex}
-                on:click={() => currentProjectIndex = index}
-                aria-label="Go to project {index + 1}"
-              ></button>
-            {/each}
+          <div class="project-nav">
+            <button class="nav-btn" on:click={prevProject} aria-label="Previous project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <div class="project-dots">
+              {#each projects as _, index}
+                <button
+                  class="dot"
+                  class:active={index === currentProjectIndex}
+                  on:click={() => currentProjectIndex = index}
+                  aria-label="Go to project {index + 1}"
+                ></button>
+              {/each}
+            </div>
+            <button class="nav-btn" on:click={nextProject} aria-label="Next project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
         {/if}
       </div>
