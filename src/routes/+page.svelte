@@ -4,26 +4,20 @@
 
   const projects = [
     {
-      name: 'ai.vivanj.dev',
-      url: 'https://ai.vivanj.dev',
-      description: 'A web platform that provides access to multiple AI models through a unified interface. Users can interact with different language models and compare their responses in real-time.'
-    },
-    {
-      name: 'Game Hub',
-      url: 'https://sharonhs.vercel.app',
-      description: 'A curated collection of browser-based games providing entertainment and interactive experiences. Features various game genres accessible from any device with a web browser.'
+      name: 'game hub',
+      url: 'https://math.vivanj.dev',
+      description: 'browser games i collected and built. no downloads required.'
     },
     {
       name: 'abcBot',
       url: '#',
-      description: 'An intelligent Discord bot built with Python that integrates multiple AI models, including custom fine-tuned variants for specialized tasks. Features natural language processing and task-specific AI interactions.',
-      status: 'In Development'
+      description: 'discord bot with ai integrations. still tryna figuring out what works best.',
+      wip: true
     },
     {
       name: 'utils.vivanj.dev',
       url: 'https://utils.vivanj.dev',
-      description: 'A collection of basic utilities, currently featuring a timer, unit converter, weather forecast, and Wordle.',
-      status: 'In Development'
+      description: 'timer, unit converter, weather, wordle, and a lot more that im still adding. pretty much basic tools I use.'
     }
   ];
 
@@ -74,7 +68,7 @@
 
     <section class="about-section">
       <h2>About</h2>
-      <p>I'm a 15-year-old software developer from Sharon, MA working primarily with JavaScript, Java, and Python. I build web applications and contribute to competitive robotics on team #27369 DeepTech through <a href="https://www.firstinspires.org/robotics/ftc" target="_blank" rel="noopener noreferrer">FIRST Tech Challenge</a>.</p>
+      <p>I'm a 15-year-old software developer from Sharon, MA working primarily with SvelteKit, JavaScript, Java, and Python. I build web applications and contribute to competitive robotics on team #27369 DeepTech through <a href="https://www.firstinspires.org/robotics/ftc" target="_blank" rel="noopener noreferrer">FIRST Tech Challenge</a>.</p>
     </section>
 
     <section class="projects-section">
@@ -82,14 +76,15 @@
       <div class="project-showcase">
         <div class="project-item">
           <h3>
-            <a href={currentProject.url} target="_blank" rel="noopener noreferrer">
-              {currentProject.name}
-            </a>
+            {#if currentProject.wip}
+              <span class="project-name">{currentProject.name}</span>
+            {:else}
+              <a href={currentProject.url} target="_blank" rel="noopener noreferrer">
+                {currentProject.name}
+              </a>
+            {/if}
           </h3>
           <p>{currentProject.description}</p>
-          {#if currentProject.status}
-            <span class="project-status">{currentProject.status}</span>
-          {/if}
         </div>
         {#if projects.length > 1}
           <div class="project-nav">
