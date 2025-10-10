@@ -2,6 +2,7 @@
   import PageInit from '$lib/PageInit.svelte';
   import { onMount } from 'svelte';
 
+  // project list
   const projects = [
     {
       name: 'game hub',
@@ -24,36 +25,34 @@
   let currentProjectIndex = 0;
   $: currentProject = projects[currentProjectIndex];
 
-  function nextProject() {
+  const nextProject = () => {
     currentProjectIndex = (currentProjectIndex + 1) % projects.length;
-  }
+  };
 
-  function prevProject() {
+  const prevProject = () => {
     currentProjectIndex = (currentProjectIndex - 1 + projects.length) % projects.length;
-  }
+  };
 
+  // fade in sections as they scroll into view
   onMount(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
         }
       });
-    }, observerOptions);
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
 
-    document.querySelectorAll('section').forEach(el => {
+    const sections = document.querySelectorAll('section');
+    sections.forEach(el => {
       el.classList.add('fade-in-section');
       observer.observe(el);
     });
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   });
 </script>
 
@@ -79,36 +78,37 @@
             {#if currentProject.wip}
               <span class="project-name">{currentProject.name}</span>
             {:else}
-              <a href={currentProject.url} target="_blank" rel="noopener noreferrer">
-                {currentProject.name}
-              </a>
+              <a href={currentProject.url} target="_blank" rel="noopener noreferrer">{currentProject.name}</a>
             {/if}
           </h3>
           <p>{currentProject.description}</p>
         </div>
+
         {#if projects.length > 1}
-          <div class="project-nav">
-            <button class="nav-btn" on:click={prevProject} aria-label="Previous project">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
-            <div class="project-dots">
-              {#each projects as _, index}
-                <button
-                  class="dot"
-                  class:active={index === currentProjectIndex}
-                  on:click={() => currentProjectIndex = index}
-                  aria-label="Go to project {index + 1}"
-                ></button>
-              {/each}
-            </div>
-            <button class="nav-btn" on:click={nextProject} aria-label="Next project">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
+        <div class="project-nav">
+          <button class="nav-btn" on:click={prevProject} aria-label="Previous project">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div class="project-dots">
+            {#each projects as _, index}
+              <button
+                class="dot"
+                class:active={index === currentProjectIndex}
+                on:click={() => currentProjectIndex = index}
+                aria-label="Go to project {index + 1}"
+              ></button>
+            {/each}
           </div>
+
+          <button class="nav-btn" on:click={nextProject} aria-label="Next project">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
         {/if}
       </div>
     </section>

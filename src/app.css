@@ -1,33 +1,25 @@
 @import 'tailwindcss';
 
-/* Hide scrollbar globally */
+/* hide scrollbars but keep functionality */
 html, body {
   overflow-x: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
   width: 0;
   height: 0;
 }
 
 :root {
-  /* Clean minimalist palette with blue-gray accents */
   --background-color: #0a0a0f;
   --text-color: #e8e8ea;
   --text-secondary: #9ca3af;
   --accent-color: #60a5fa;
-  --accent-secondary: #3b82f6;
   --border-color: rgba(96, 165, 250, 0.12);
-  --card-bg: rgba(15, 23, 42, 0.4);
-  --link-color: #93c5fd;
-  /* Font stacks */
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
-  --font-sans: var(--font-mono);
-  --font-heading: var(--font-mono);
 }
 
 * {
@@ -59,6 +51,7 @@ body::before {
   z-index: 0;
 }
 
+/* floating chess knight background */
 body::after {
   content: '♞';
   position: fixed;
@@ -80,7 +73,7 @@ body::after {
     knightOpacity 7s ease-in-out infinite;
 }
 
-/* Smooth horizontal movement (sine wave) */
+/* knight animations - layered for smooth continuous movement */
 @keyframes knightX {
   0%, 100% { transform: translate(calc(-50% + 0px), -50%); }
   25% { transform: translate(calc(-50% + 20px), -50%); }
@@ -88,7 +81,6 @@ body::after {
   75% { transform: translate(calc(-50% - 20px), -50%); }
 }
 
-/* Smooth vertical movement (cosine wave) */
 @keyframes knightY {
   0%, 100% { transform: translate(-50%, calc(-50% + 0px)); }
   25% { transform: translate(-50%, calc(-50% - 15px)); }
@@ -96,7 +88,6 @@ body::after {
   75% { transform: translate(-50%, calc(-50% + 15px)); }
 }
 
-/* Smooth rotation */
 @keyframes knightRotate {
   0%, 100% { rotate: -4deg; }
   25% { rotate: 6deg; }
@@ -104,13 +95,11 @@ body::after {
   75% { rotate: 6deg; }
 }
 
-/* Smooth scale pulse */
 @keyframes knightScale {
   0%, 100% { scale: 1; }
   50% { scale: 1.05; }
 }
 
-/* Smooth opacity breathing */
 @keyframes knightOpacity {
   0%, 100% { opacity: 0.015; }
   50% { opacity: 0.025; }
@@ -141,13 +130,12 @@ body::after {
   display: none;
 }
 
-/* Header */
+/* header */
 .main-header {
   margin-bottom: 4rem;
 }
 
 .main-header h1 {
-  font-family: var(--font-heading);
   font-size: clamp(2.5rem, 6vw, 3.5rem);
   font-weight: 700;
   color: #ffffff;
@@ -163,7 +151,7 @@ body::after {
   font-weight: 400;
 }
 
-/* Sections */
+/* sections */
 section {
   margin-bottom: 3.5rem;
   position: relative;
@@ -193,7 +181,7 @@ section p {
   margin: 0 0 1rem 0;
 }
 
-/* Projects Section */
+/* projects */
 .project-showcase {
   padding-left: 1rem;
   padding-top: 0.5rem;
@@ -301,7 +289,7 @@ section p {
   border-radius: 3px;
 }
 
-/* Scroll Animations */
+/* fade in animations */
 .fade-in-section {
   opacity: 0;
   transform: translateY(20px);
@@ -313,7 +301,7 @@ section p {
   transform: translateY(0);
 }
 
-/* Particle Effects */
+/* particles */
 .particles {
   position: fixed;
   top: 0;
@@ -355,7 +343,6 @@ section p {
   }
 }
 
-/* Contact Section */
 .contact-section p {
   color: var(--text-secondary);
 }
@@ -366,7 +353,7 @@ section p {
   border-top: 1px solid var(--border-color);
 }
 
-/* Mobile Responsive */
+/* mobile */
 @media (max-width: 768px) {
   .container {
     padding: 0 1rem;
@@ -448,7 +435,7 @@ section p {
 
 
 a {
-  color: var(--link-color);
+  color: #93c5fd;
   text-decoration: none;
   border-bottom: 1px solid rgba(147, 197, 253, 0.3);
   transition: color 0.15s ease, border-bottom-color 0.15s ease;
@@ -456,27 +443,25 @@ a {
 }
 
 a:hover {
-  color: #60a5fa;
+  color: var(--accent-color);
   border-bottom-color: rgba(96, 165, 250, 0.5);
 }
 
-
-
-
-
-/* Subtle selection */
 ::selection {
   background: rgba(59, 130, 246, 0.3);
   color: var(--text-color);
 }
 
-/* Ensure system cursor is visible globally */
+/* cursor stuff */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--text-color);
+}
+/* cursor stuff */
 :root, :root * {
   cursor: auto !important;
 }
 
-/* Keep pointer on interactive elements */
-a, button, [role="button"], input[type="button"], input[type="submit"], .scroll-arrow {
+a, button, [role="button"], input[type="button"], input[type="submit"] {
   cursor: pointer !important;
 }
-

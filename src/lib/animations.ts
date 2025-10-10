@@ -12,7 +12,6 @@ export class PageAnimations {
     this.mainContent = document.querySelector('.container');
     if (!this.mainContent) return;
 
-    // Make content visible and animate on scroll
     gsap.set(this.mainContent, { opacity: 1 });
     gsap.set(this.mainContent.children, { opacity: 0, y: 50 });
     
