@@ -10,8 +10,6 @@ html, body {
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
-  width: 0;
-  height: 0;
 }
 
 :root {
@@ -59,12 +57,15 @@ body::after {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 20rem;
-  opacity: 0.015;
+  opacity: 0.04;
   pointer-events: none;
   z-index: 0;
   color: var(--accent-color);
   user-select: none;
-  margin-left: 0;
+  filter: blur(2px);
+  text-shadow: 
+    0 0 40px rgba(96, 165, 250, 0.3),
+    0 0 80px rgba(96, 165, 250, 0.15);
   animation: 
     knightX 12s ease-in-out infinite,
     knightY 8s ease-in-out infinite,
@@ -101,15 +102,14 @@ body::after {
 }
 
 @keyframes knightOpacity {
-  0%, 100% { opacity: 0.015; }
-  50% { opacity: 0.025; }
+  0%, 100% { opacity: 0.035; }
+  50% { opacity: 0.05; }
 }
 
 .container {
   max-width: 700px;
   height: 100vh;
   margin: 0 auto;
-  padding: 0;
   position: relative;
   z-index: 1;
   display: flex;
@@ -147,7 +147,6 @@ body::after {
 .subtitle {
   font-size: clamp(1rem, 2vw, 1.125rem);
   color: var(--text-secondary);
-  margin: 0;
   font-weight: 400;
 }
 
@@ -275,7 +274,6 @@ section p {
   border: none;
   cursor: pointer;
   transition: all 0.25s ease;
-  padding: 0;
 }
 
 .dot:hover {

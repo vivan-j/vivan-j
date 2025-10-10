@@ -7,7 +7,7 @@
     {
       name: 'game hub',
       url: 'https://math.vivanj.dev',
-      description: 'browser games i collected and built. no downloads required.'
+      description: 'browser games i collected and built (redesigned repo fork). no downloads required.'
     },
     {
       name: 'abcBot',
@@ -18,7 +18,7 @@
     {
       name: 'utils.vivanj.dev',
       url: 'https://utils.vivanj.dev',
-      description: 'timer, unit converter, weather, wordle, and a lot more that im still adding. pretty much basic tools I use.'
+      description: 'timer, unit converter, weather, wordle, and a lot more that im still adding. pretty much top searches/basic tools that are free to use without ads.'
     }
   ];
 
