@@ -16,8 +16,8 @@
       wip: true
     },
     {
-      name: 'utils.vivanj.dev',
-      url: 'https://utils.vivanj.dev',
+      name: 'smth.tech',
+      url: 'https://smth.tech',
       description: 'timer, unit converter, weather, wordle, and a lot more that im still adding. pretty much top searches/basic tools that are free to use without ads.'
     }
   ];
