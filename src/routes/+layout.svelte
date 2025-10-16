@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/v1.png';
+	import NowPlaying from '$lib/NowPlaying.svelte';
 
 	let { children } = $props();
 </script>
@@ -13,3 +14,4 @@
 </svelte:head>
 
 {@render children?.()}
+<NowPlaying />
