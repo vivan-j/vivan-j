@@ -2,23 +2,56 @@
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
 
-  let data: { playing: boolean; title?: string; artist?: string; url?: string; artwork?: string | null } | null = null;
+  type NowData = {
+    playing: boolean;
+    title?: string;
+    artist?: string;
+    url?: string;
+    artwork?: string | null;
+    progressMs?: number | null;
+    durationMs?: number | null;
+    serverTime?: number;
+  };
+
+  let data: NowData | null = null;
   let visible = false;
+  let timer: number | null = null;
+
+  function scheduleNextPoll() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    // Default: 60s
+    let nextIn = 60_000;
+    if (data?.playing && typeof data.progressMs === 'number' && typeof data.durationMs === 'number') {
+      const remaining = Math.max(0, data.durationMs - data.progressMs);
+      // Add a small jitter (200-600ms) to avoid syncing across clients
+      const jitter = 200 + Math.random() * 400;
+      // Cap between 1.5s and 90s
+      nextIn = Math.min(90_000, Math.max(1_500, remaining + jitter));
+    }
+    timer = setTimeout(load, nextIn) as unknown as number;
+  }
 
   async function load() {
     try {
-      const res = await fetch('/api/spotify/now-playing');
+      // Add cache-busting param and explicit no-store to avoid stale CDN/browser responses
+      const url = `/api/spotify/now-playing?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-store', headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' } });
       if (!res.ok) return;
       data = await res.json();
       visible = !!(data && (data.title || data.artist));
+      scheduleNextPoll();
     } catch {}
   }
 
   onMount(() => {
     if (!browser) return;
     load();
-    const id = setInterval(load, 60_000);
-    return () => clearInterval(id);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   });
 </script>
 

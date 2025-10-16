@@ -53,13 +53,25 @@ export const GET: RequestHandler = async () => {
 
     if (now && now.item) {
       const item = now.item;
+      const progressMs = typeof now.progress_ms === 'number' ? now.progress_ms : null;
+      const durationMs = typeof item.duration_ms === 'number' ? item.duration_ms : null;
       return new Response(JSON.stringify({
         playing: now.is_playing ?? false,
         title: item.name,
         artist: item.artists?.map((a: any) => a.name).join(', '),
         url: item.external_urls?.spotify,
-        artwork: item.album?.images?.[1]?.url || item.album?.images?.[0]?.url || null
-      }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+        artwork: item.album?.images?.[1]?.url || item.album?.images?.[0]?.url || null,
+        progressMs,
+        durationMs,
+        serverTime: Date.now()
+      }), { headers: {
+        'Content-Type': 'application/json',
+        // prevent CDN/browser caching
+        'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'CDN-Cache-Control': 'no-store'
+      } });
     }
 
     const recent = await fetchRecent(token);
@@ -70,12 +82,36 @@ export const GET: RequestHandler = async () => {
         title: last.name,
         artist: last.artists?.map((a: any) => a.name).join(', '),
         url: last.external_urls?.spotify,
-        artwork: last.album?.images?.[1]?.url || last.album?.images?.[0]?.url || null
-      }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+        artwork: last.album?.images?.[1]?.url || last.album?.images?.[0]?.url || null,
+        progressMs: null,
+        durationMs: typeof last.duration_ms === 'number' ? last.duration_ms : null,
+        serverTime: Date.now()
+      }), { headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'CDN-Cache-Control': 'no-store'
+      } });
     }
 
-    return new Response(JSON.stringify({ playing: false }), { status: 200 });
+    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'CDN-Cache-Control': 'no-store'
+    } });
   } catch (e) {
-    return new Response(JSON.stringify({ playing: false }), { status: 200 });
+    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'CDN-Cache-Control': 'no-store'
+    } });
   }
 };
+
+// Ensure Node runtime on Vercel (not Edge), avoids missing Buffer and subtle caching behavior
+export const config = { runtime: 'nodejs18.x' } as const;
