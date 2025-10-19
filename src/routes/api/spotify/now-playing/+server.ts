@@ -114,4 +114,6 @@ export const GET: RequestHandler = async () => {
 };
 
 // Ensure Node runtime on Vercel (not Edge), avoids missing Buffer and subtle caching behavior
-export const config = { runtime: 'nodejs18.x' } as const;
+// Ensure a supported Node runtime on Vercel (not Edge) to allow Buffer and other Node APIs.
+// Vercel official runtimes: nodejs20.x is current (nodejs18.x may be deprecated).
+export const config = { runtime: 'nodejs20.x' } as const;
