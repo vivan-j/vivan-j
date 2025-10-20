@@ -8,6 +8,7 @@
   let emailCopied = false;
   let viewCount = 0;
   let currentAge = 15;
+  let isDarkMode = true;
 
   // calculate current age based on birthday (september 24th)
   function calculateAge() {
@@ -27,10 +28,26 @@
     return hasHadBirthdayThisYear ? currentYear - birthYear : currentYear - birthYear - 1;
   }
 
+  function toggleTheme() {
+    isDarkMode = !isDarkMode;
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }
+
   // real view counter from server
   onMount(async () => {
     // calculate current age
     currentAge = calculateAge();
+    
+    // load saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      isDarkMode = savedTheme === 'dark';
+    } else {
+      // default to dark mode
+      isDarkMode = true;
+    }
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
     
     try {
       const response = await fetch('/api/analytics');
@@ -223,6 +240,11 @@
     </div>
   </main>
   
+  <!-- subtle theme toggle -->
+  <button class="theme-toggle" on:click={toggleTheme} title={isDarkMode ? 'switch to light mode' : 'switch to dark mode'}>
+    <div class="moon-icon" class:light={!isDarkMode}></div>
+  </button>
+
   <!-- subtle view counter -->
   {#if viewCount > 0}
     <div class="view-counter">
