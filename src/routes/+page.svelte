@@ -4,6 +4,21 @@
 
   let projectsOpen = false;
   let roboticsOpen = false;
+  let emailCopied = false;
+  let viewCount = 0;
+
+  // simple view counter (just for fun)
+  onMount(() => {
+    // get stored count or start at random number to make it interesting
+    const stored = localStorage.getItem('viewCount');
+    if (stored) {
+      viewCount = parseInt(stored) + 1;
+    } else {
+      // start with a random number between 100-500 to make it look established
+      viewCount = Math.floor(Math.random() * 400) + 100;
+    }
+    localStorage.setItem('viewCount', viewCount.toString());
+  });
 
   const projects = [
     {
@@ -97,7 +112,16 @@
       <p>currently working with sveltekit, javascript, java, and python. part of first tech challenge team #27369 deeptech.</p>
       
       <div class="contact">
-        <a href="mailto:hi@smth.tech">hi@smth.tech</a>
+        <button 
+          class="email-copy" 
+          on:click={() => {
+            navigator.clipboard.writeText('hi@smth.tech');
+            emailCopied = true;
+            setTimeout(() => emailCopied = false, 2000);
+          }}
+        >
+          {emailCopied ? 'copied!' : 'hi@smth.tech'}
+        </button>
         <div class="links">
           <a href="https://github.com/vivan-j">github</a>
           <a href="https://linkedin.com/in/vivanj">linkedin</a>
@@ -167,6 +191,13 @@
       {/if}
     </div>
   </main>
+  
+  <!-- subtle view counter -->
+  {#if viewCount > 0}
+    <div class="view-counter">
+      visitor #{viewCount.toLocaleString()}
+    </div>
+  {/if}
 </div>
 
 
