@@ -7,9 +7,31 @@
   let roboticsOpen = false;
   let emailCopied = false;
   let viewCount = 0;
+  let currentAge = 15;
+
+  // calculate current age based on birthday (september 24th)
+  function calculateAge() {
+    const today = new Date();
+    const birthDate = new Date(today.getFullYear(), 8, 24); // september is month 8 (0-indexed)
+    
+    // if birthday hasn't happened this year, use last year's birth year
+    if (today < birthDate) {
+      birthDate.setFullYear(today.getFullYear() - 1);
+    }
+    
+    // calculate age based on birth year
+    const birthYear = 2010;
+    const currentYear = today.getFullYear();
+    const hasHadBirthdayThisYear = today >= new Date(currentYear, 8, 24);
+    
+    return hasHadBirthdayThisYear ? currentYear - birthYear : currentYear - birthYear - 1;
+  }
 
   // real view counter from server
   onMount(async () => {
+    // calculate current age
+    currentAge = calculateAge();
+    
     try {
       const response = await fetch('/api/analytics');
       const data = await response.json();
@@ -110,7 +132,7 @@
       <h1 class="name-hover">
         <span>v</span><span>i</span><span>v</span><span>a</span><span>n</span> <span>j</span><span>a</span><span>i</span><span>s</span><span>w</span><span>a</span><span>l</span>
       </h1>
-      <p>i'm 15, based in sharon, ma. i build web apps and compete in robotics.</p>
+      <p>i'm {currentAge}, based in sharon, ma. i build web apps and compete in robotics.</p>
       <p>currently working with sveltekit, javascript, java, and python. part of first tech challenge team #27369 deeptech.</p>
       
       <div class="contact">
