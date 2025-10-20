@@ -7,15 +7,16 @@
   let emailCopied = false;
   let viewCount = 0;
 
-  // simple view counter (just for fun)
-  onMount(() => {
-    const stored = localStorage.getItem('viewCount');
-    if (stored) {
-      viewCount = parseInt(stored) + 1;
-    } else {
-      viewCount = 1;
+  // real view counter from server
+  onMount(async () => {
+    try {
+      const response = await fetch('/api/analytics');
+      const data = await response.json();
+      viewCount = data.views || 0;
+    } catch (error) {
+      console.error('failed to fetch view count:', error);
+      viewCount = 0;
     }
-    localStorage.setItem('viewCount', viewCount.toString());
   });
 
   const projects = [
