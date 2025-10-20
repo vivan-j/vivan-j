@@ -9,13 +9,11 @@
 
   // simple view counter (just for fun)
   onMount(() => {
-    // get stored count or start at random number to make it interesting
     const stored = localStorage.getItem('viewCount');
     if (stored) {
       viewCount = parseInt(stored) + 1;
     } else {
-      // start with a random number between 100-500 to make it look established
-      viewCount = Math.floor(Math.random() * 400) + 100;
+      viewCount = 1;
     }
     localStorage.setItem('viewCount', viewCount.toString());
   });
