@@ -147,9 +147,9 @@
           {emailCopied ? 'copied!' : 'hi@smth.tech'}
         </button>
         <div class="links">
-          <a href="https://github.com/vivan-j">github</a>
-          <a href="https://linkedin.com/in/vivanj">linkedin</a>
-          <a href="https://instagram.com/vivan.jaiswal1">instagram</a>
+          <a href="https://github.com/vivan-j" target="_blank" rel="noopener noreferrer">github</a>
+          <a href="https://linkedin.com/in/vivanj" target="_blank" rel="noopener noreferrer">linkedin</a>
+          <a href="https://instagram.com/vivan.jaiswal1" target="_blank" rel="noopener noreferrer">instagram</a>
         </div>
         
 
