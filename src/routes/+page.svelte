@@ -1,5 +1,6 @@
 <script lang="ts">
   import PageInit from '$lib/PageInit.svelte';
+  import TypingTest from '$lib/TypingTest.svelte';
   import { onMount } from 'svelte';
 
   let projectsOpen = false;
@@ -106,7 +107,9 @@
 <div class="page">
   <main>
     <div class="intro-section">
-      <h1>vivan jaiswal</h1>
+      <h1 class="name-hover">
+        <span>v</span><span>i</span><span>v</span><span>a</span><span>n</span> <span>j</span><span>a</span><span>i</span><span>s</span><span>w</span><span>a</span><span>l</span>
+      </h1>
       <p>i'm 15, based in sharon, ma. i build web apps and compete in robotics.</p>
       <p>currently working with sveltekit, javascript, java, and python. part of first tech challenge team #27369 deeptech.</p>
       
@@ -126,6 +129,8 @@
           <a href="https://linkedin.com/in/vivanj">linkedin</a>
           <a href="https://instagram.com/vivan.jaiswal1">instagram</a>
         </div>
+        
+
       </div>
     </div>
 
@@ -188,6 +193,11 @@
           <p>it's taught me hardware and software integration and how to work under pressure with a team.</p>
         </div>
       {/if}
+    </div>
+
+    <!-- seamless typing test integration -->
+    <div class="typing-section">
+      <TypingTest />
     </div>
   </main>
   
