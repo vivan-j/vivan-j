@@ -78,67 +78,8 @@
     }
   ];
 
-  // tab title typing thing
-  onMount(() => {
-    const name = 'vivan jaiswal';
-    const cursor = '|';
-    let currentIndex = 0;
-    let isTyping = true;
-    let showCursor = true;
-    let timeoutId: number;
-    
-    const updateTitle = () => {
-      // clear timeout
-      if (timeoutId) clearTimeout(timeoutId);
-      
-      if (isTyping) {
-        currentIndex++;
-        const currentText = name.substring(0, currentIndex);
-        document.title = currentText + (showCursor ? cursor : '');
-        
-        if (currentIndex >= name.length) {
-          isTyping = false;
-          // blink cursor
-          blinkCursor();
-          timeoutId = setTimeout(() => {
-            showCursor = true;
-            updateTitle();
-          }, 2000); // pause at end
-        } else {
-          timeoutId = setTimeout(updateTitle, 200); // typing speed
-        }
-      } else {
-        currentIndex--;
-        
-        if (currentIndex <= 1) {
-          // stop at v|
-          document.title = name.substring(0, 1) + cursor;
-          isTyping = true;
-          showCursor = true;
-          timeoutId = setTimeout(updateTitle, 1500); // pause
-        } else {
-          document.title = name.substring(0, currentIndex);
-          timeoutId = setTimeout(updateTitle, 120); // delete speed
-        }
-      }
-    };
-    
-    const blinkCursor = () => {
-      if (!isTyping && currentIndex >= name.length) {
-        showCursor = !showCursor;
-        document.title = name + (showCursor ? cursor : '');
-        setTimeout(blinkCursor, 500); // blink speed
-      }
-    };
-    
-    // start
-    updateTitle();
-    
-    // cleanup
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  });
+  // note: removed document.title animation to preserve "vivan jaiswal" in SEO
+  // (search engines and embeds see partial titles if they crawl mid-animation)
 </script>
 
 <PageInit />
