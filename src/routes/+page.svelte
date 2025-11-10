@@ -108,6 +108,8 @@
           <a href="https://github.com/vivan-j" target="_blank" rel="noopener noreferrer">github</a>
           <a href="https://linkedin.com/in/vivanj" target="_blank" rel="noopener noreferrer">linkedin</a>
           <a href="https://instagram.com/vivan.jaiswal1" target="_blank" rel="noopener noreferrer">instagram</a>
+          <a href="https://www.chess.com/member/chesschampv1" target="_blank" rel="noopener noreferrer">chess.com</a>
+
         </div>
         
 
