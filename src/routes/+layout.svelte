@@ -7,7 +7,7 @@
 
 	let { children } = $props();
 
-	// inject analytics in production
+	// only track analytics in production
 	if (!dev) {
 		inject();
 	}

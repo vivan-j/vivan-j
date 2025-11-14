@@ -15,20 +15,20 @@ async function getRedisClient() {
 
 export const GET: RequestHandler = async () => {
   try {
-    // check if redis url is configured
+    // need redis to be configured first
     if (!REDIS_URL) {
-      console.log('redis url not configured, using fallback');
+      console.log('redis not set up');
       return json({ views: null });
     }
 
     const client = await getRedisClient();
     
-    // increment view count atomically
+    // add 1 to the total view count
     const viewCount = await client.incr('viewCount');
     return json({ views: viewCount });
   } catch (error) {
     console.error('redis error:', error);
-    // fallback if redis fails
+    // just return null if something goes wrong
     return json({ views: null });
   }
 };

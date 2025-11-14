@@ -9,18 +9,18 @@
   let viewCount = 0;
   let currentAge = 15;
   let isDarkMode = true;
+  let chessStats: any = null;
+  let typingTestVisible = false;
 
-  // calculate current age based on birthday (september 24th)
+  // figure out my age from my birthday
   function calculateAge() {
     const today = new Date();
-    const birthDate = new Date(today.getFullYear(), 8, 24); // september is month 8 (0-indexed)
+    const birthDate = new Date(today.getFullYear(), 8, 24); // months are 0-indexed
     
-    // if birthday hasn't happened this year, use last year's birth year
     if (today < birthDate) {
       birthDate.setFullYear(today.getFullYear() - 1);
     }
     
-    // calculate age based on birth year
     const birthYear = 2010;
     const currentYear = today.getFullYear();
     const hasHadBirthdayThisYear = today >= new Date(currentYear, 8, 24);
@@ -34,17 +34,15 @@
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }
 
-  // real view counter from server
+  // pull view count when page loads
   onMount(async () => {
-    // calculate current age
     currentAge = calculateAge();
     
-    // load saved theme preference
+    // check for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       isDarkMode = savedTheme === 'dark';
     } else {
-      // default to dark mode
       isDarkMode = true;
     }
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -57,6 +55,24 @@
       console.error('failed to fetch view count:', error);
       viewCount = 0;
     }
+
+    // fetch chess stats
+    try {
+      const response = await fetch('/api/chess');
+      const data = await response.json();
+      if (data.rapid) {
+        chessStats = data;
+      }
+    } catch (error) {
+      console.error('failed to fetch chess stats:', error);
+    }
+
+    // typing test easter egg - press 't' to reveal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 't' || e.key === 'T') {
+        typingTestVisible = true;
+      }
+    });
   });
 
   const projects = [
@@ -78,8 +94,8 @@
     }
   ];
 
-  // note: removed document.title animation to preserve "vivan jaiswal" in SEO
-  // (search engines and embeds see partial titles if they crawl mid-animation)
+  // removed the title animation because it was showing partial text in search results and embeds
+  // keeping it static lets the full name show up everywhere
 </script>
 
 <PageInit />
@@ -105,13 +121,26 @@
           {emailCopied ? 'copied!' : 'hi@smth.tech'}
         </button>
         <div class="links">
-          <a href="https://github.com/vivan-j" target="_blank" rel="noopener noreferrer">github</a>
-          <a href="https://linkedin.com/in/vivanj" target="_blank" rel="noopener noreferrer">linkedin</a>
-          <a href="https://instagram.com/vivan.jaiswal1" target="_blank" rel="noopener noreferrer">instagram</a>
-          <a href="https://www.chess.com/member/chesschampv1" target="_blank" rel="noopener noreferrer">chess.com</a>
+          <span class="link-with-tooltip">
+            <a href="https://github.com/vivan-j" target="_blank" rel="noopener noreferrer">github</a>
+            <span class="link-tooltip">vivan-j</span>
+          </span>
+          <span class="link-with-tooltip">
+            <a href="https://linkedin.com/in/vivanj" target="_blank" rel="noopener noreferrer">linkedin</a>
+            <span class="link-tooltip">vivanj</span>
+          </span>
+          <span class="link-with-tooltip">
+            <a href="https://instagram.com/vivan.jaiswal1" target="_blank" rel="noopener noreferrer">instagram</a>
+            <span class="link-tooltip">vivan.jaiswal1</span>
+          </span>
+          <span class="chess-link">
+            <a href="https://www.chess.com/member/chesschampv1" target="_blank" rel="noopener noreferrer">chess.com</a>
+            {#if chessStats}
+              <span class="chess-tooltip">{chessStats.rapid}</span>
+            {/if}
+          </span>
 
         </div>
-        
 
       </div>
     </div>
@@ -177,10 +206,12 @@
       {/if}
     </div>
 
-    <!-- seamless typing test integration -->
-    <div class="typing-section">
-      <TypingTest />
-    </div>
+    <!-- typing test easter egg - press 't' to reveal -->
+    {#if typingTestVisible}
+      <div class="typing-section">
+        <TypingTest />
+      </div>
+    {/if}
   </main>
   
   <!-- subtle theme toggle -->

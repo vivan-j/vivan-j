@@ -161,10 +161,6 @@ main {
 
 .intro-section h1:hover {
   transform: translateY(-2px);
-  text-shadow: 
-    0 0 20px rgba(96, 165, 250, 0.4),
-    0 0 40px rgba(96, 165, 250, 0.2),
-    0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* cool hover effects for other elements */
@@ -248,7 +244,6 @@ body:active::after {
   50% { 
     transform: translateY(-8px) rotate(2deg); 
     color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
   }
 }
 
@@ -435,6 +430,72 @@ body:active::after {
   background: var(--accent-color);
   opacity: 0.8;
   transform: translateY(-50%) scale(1.5);
+}
+
+/* chess.com rating tooltip */
+.chess-link {
+  position: relative;
+  display: inline-block;
+}
+
+.chess-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: var(--accent-color);
+  color: var(--background-color);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.chess-link:hover .chess-tooltip {
+  opacity: 1;
+}
+
+[data-theme="light"] .chess-tooltip {
+  background: #5b7c99;
+  color: #fbfbf2;
+}
+
+/* social link tooltips */
+.link-with-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.link-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: var(--accent-color);
+  color: var(--background-color);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.link-with-tooltip:hover .link-tooltip {
+  opacity: 1;
+}
+
+[data-theme="light"] .link-tooltip {
+  background: #5b7c99;
+  color: #fbfbf2;
 }
 
 /* sections */
@@ -666,17 +727,6 @@ a:hover {
     0 0 120px rgba(91, 124, 153, 0.15);
 }
 
-[data-theme="light"] .intro-section h1:hover {
-  text-shadow: 
-    0 0 20px rgba(91, 124, 153, 0.3),
-    0 0 40px rgba(91, 124, 153, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .name-hover:hover span {
-  text-shadow: 0 0 10px rgba(91, 124, 153, 0.4);
-}
-
 [data-theme="light"] .theme-toggle {
   background: rgba(91, 124, 153, 0.08);
   border: 1px solid rgba(91, 124, 153, 0.15);
@@ -689,6 +739,22 @@ a:hover {
 
 [data-theme="light"] a:hover {
   border-bottom-color: rgba(91, 124, 153, 0.4);
+}
+
+/* NowPlaying component light theme */
+[data-theme="light"] .now-playing {
+  background: rgba(251, 251, 242, 0.95) !important;
+  border-color: rgba(91, 124, 153, 0.15) !important;
+  color: #2d2d2a;
+}
+
+[data-theme="light"] .now-playing .art {
+  background: #fbfbf2;
+  border-color: rgba(91, 124, 153, 0.15);
+}
+
+[data-theme="light"] .now-playing .artist {
+  color: #6b6b5f;
 }
 /* cursor stuff */
 :root, :root * {

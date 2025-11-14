@@ -31,7 +31,7 @@
 
   function updateProgress() {
     if (data?.playing && typeof data.progressMs === 'number' && typeof data.serverTime === 'number') {
-      // Estimate current progress based on time elapsed since server response
+      // estimate where we are in the song based on how much time has passed
       const elapsed = Date.now() - data.serverTime;
       currentProgressMs = data.progressMs + elapsed;
     }
@@ -47,24 +47,24 @@
       timer = null;
     }
     
-    let nextIn = 15_000; // default: 15s for better responsiveness
+    let nextIn = 15_000; // default: 15s
     
     if (data?.playing && typeof data.progressMs === 'number' && typeof data.durationMs === 'number') {
       const remaining = Math.max(0, data.durationMs - data.progressMs);
-      const jitter = 200 + Math.random() * 400; // small jitter
+      const jitter = 200 + Math.random() * 400;
       
       if (remaining < 10_000) {
-        // song ending soon, poll very frequently
+        // song's almost done, check really often
         nextIn = Math.max(1_500, remaining + jitter);
       } else if (remaining < 30_000) {
-        // song ending in 30s, poll every 3s
+        // last 30 seconds, check every 3s
         nextIn = 3_000 + jitter;
       } else {
-        // actively playing - poll every 8s to catch manual skips
+        // normal playing, check every 8s for skips
         nextIn = 8_000 + jitter;
       }
     } else if (!data?.playing) {
-      // not playing, check frequently for new songs
+      // not playing, check often for new songs
       nextIn = 10_000;
     }
     
@@ -73,7 +73,7 @@
 
   async function load() {
     try {
-      // Add cache-busting param and explicit no-store to avoid stale CDN/browser responses
+      // add cache-busting and force fresh data
       const url = `/api/spotify/now-playing?t=${Date.now()}`;
       const res = await fetch(url, { cache: 'no-store', headers: { 'pragma': 'no-cache', 'cache-control': 'no-cache' } });
       if (res.ok) {
@@ -81,14 +81,14 @@
         visible = !!(data && (data.title || data.artist));
         currentProgressMs = data?.progressMs ?? 0;
         
-        // Start animation frame for real-time progress
+        // start animating progress if playing
         if (data?.playing) {
           if (animationFrame) cancelAnimationFrame(animationFrame);
           updateProgress();
         }
       }
     } catch (err) {
-      // optional: console.warn('NowPlaying fetch failed', err);
+      // silently fail, retry on next poll
     } finally {
       loading = false;
       scheduleNextPoll();
@@ -122,18 +122,6 @@
       <img class="art" src={data.artwork} alt="" loading="lazy" decoding="async" />
     {:else}
       <span class:dot={data.playing}></span>
-    {/if}
-    {#if variant === 'pill'}
-      <span class="viz" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </span>
     {/if}
     {#if variant === 'inline'}
       <span class="label">listening to</span>
@@ -170,7 +158,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border: 1px solid rgba(96, 165, 250, 0.2);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     background: rgba(10, 10, 15, 0.85);
     backdrop-filter: blur(12px);
@@ -188,19 +176,19 @@
   /* Hover & focus states */
   .now-playing:hover {
     opacity: 1;
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: var(--accent-color);
     box-shadow: none;
     transform: translateY(-2px);
   }
 
   .now-playing:focus-visible {
-    outline: 2px solid rgba(96, 165, 250, 0.6);
+    outline: 2px solid var(--accent-color);
     outline-offset: 2px;
   }
 
   /* Playing state */
   .now-playing.playing {
-    border-color: rgba(96, 165, 250, 0.35);
+    border-color: var(--accent-color);
     box-shadow: none;
   }
 
@@ -211,7 +199,6 @@
     border-radius: 4px;
     object-fit: cover;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: #0b0b12;
   }
@@ -265,103 +252,10 @@
     left: 0;
     height: 2px;
     width: var(--progress, 0%);
-    background: linear-gradient(90deg, var(--accent-color), rgba(96, 165, 250, 0.6));
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-color));
     border-radius: 0 0 10px 0;
     transition: width 0.1s linear;
     opacity: 0.8;
-  }
-  .now-playing .viz {
-    position: absolute;
-    inset: -14px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .now-playing.playing .viz {
-    opacity: 1;
-  }
-
-  .now-playing .viz span {
-    position: absolute;
-    width: 3px;
-    background: linear-gradient(to top, var(--accent-color), rgba(96, 165, 250, 0.2));
-    border-radius: 2px;
-    animation: eqRadial 1.4s ease-in-out infinite;
-    box-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
-  }
-
-  /* Position 8 bars around the pill - every 45 degrees */
-  /* Top */
-  .now-playing .viz span:nth-child(1) {
-    top: -14px;
-    left: 50%;
-    height: 14px;
-    transform: translateX(-50%);
-    animation-delay: 0s;
-  }
-
-  /* Top-right */
-  .now-playing .viz span:nth-child(2) {
-    top: -8px;
-    right: -8px;
-    height: 14px;
-    transform: rotate(45deg);
-    animation-delay: 0.08s;
-  }
-
-  /* Right */
-  .now-playing .viz span:nth-child(3) {
-    right: -14px;
-    top: 50%;
-    height: 14px;
-    transform: translateY(-50%);
-    animation-delay: 0.16s;
-  }
-
-  /* Bottom-right */
-  .now-playing .viz span:nth-child(4) {
-    bottom: -8px;
-    right: -8px;
-    height: 14px;
-    transform: rotate(45deg);
-    animation-delay: 0.24s;
-  }
-
-  /* Bottom */
-  .now-playing .viz span:nth-child(5) {
-    bottom: -14px;
-    left: 50%;
-    height: 14px;
-    transform: translateX(-50%);
-    animation-delay: 0.32s;
-  }
-
-  /* Bottom-left */
-  .now-playing .viz span:nth-child(6) {
-    bottom: -8px;
-    left: -8px;
-    height: 14px;
-    transform: rotate(45deg);
-    animation-delay: 0.4s;
-  }
-
-  /* Left */
-  .now-playing .viz span:nth-child(7) {
-    left: -14px;
-    top: 50%;
-    height: 14px;
-    transform: translateY(-50%);
-    animation-delay: 0.48s;
-  }
-
-  /* Top-left */
-  .now-playing .viz span:nth-child(8) {
-    top: -8px;
-    left: -8px;
-    height: 14px;
-    transform: rotate(45deg);
-    animation-delay: 0.56s;
   }
 
   /* Shimmer effect when playing */
@@ -462,10 +356,10 @@
 
   @keyframes pulse {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.5);
+      opacity: 0.8;
     }
     50% {
-      box-shadow: 0 0 0 6px rgba(96, 165, 250, 0);
+      opacity: 1;
     }
   }
 
@@ -478,17 +372,6 @@
     }
     70% {
       transform: scaleY(0.6);
-    }
-  }
-
-  @keyframes eqRadial {
-    0%, 100% {
-      opacity: 0.4;
-      height: 6px;
-    }
-    50% {
-      opacity: 1;
-      height: 24px;
     }
   }
 
@@ -545,7 +428,6 @@
     .now-playing,
     .now-playing .content,
     .now-playing .dot,
-    .now-playing .viz span,
     .now-playing::after {
       animation: none;
       transition: none;
