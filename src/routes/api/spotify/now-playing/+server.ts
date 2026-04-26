@@ -1,13 +1,12 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
-const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
-const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
-
-const basic = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
-
 async function getAccessToken() {
+  const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
+  const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
+  const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
+  const basic = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+
   const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -29,9 +28,12 @@ async function fetchNowPlaying(access_token: string) {
   const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
     headers: { Authorization: `Bearer ${access_token}` }
   });
-  // 204 or 202 means nothing's playing right now
-  if (res.status === 204 || res.status === 202) return null;
-  if (!res.ok) throw new Error('failed to fetch now playing');
+  // 204/202 = nothing playing, 403 = premium required (fall through to recent)
+  if (res.status === 204 || res.status === 202 || res.status === 403) return null;
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`failed to fetch now playing: ${res.status} ${body}`);
+  }
   return res.json();
 }
 
@@ -39,13 +41,28 @@ async function fetchRecent(access_token: string) {
   const res = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
     headers: { Authorization: `Bearer ${access_token}` }
   });
+  // 403 = premium required
+  if (res.status === 403) return { items: [] };
   if (!res.ok) throw new Error('failed to fetch recently played');
   return res.json();
 }
 
+const NO_CACHE_HEADERS = {
+  'Content-Type': 'application/json',
+  'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+  'CDN-Cache-Control': 'no-store'
+};
+
 export const GET: RequestHandler = async () => {
   try {
+    const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
+    const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
+    const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
+
     if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
+      console.log('spotify env vars missing');
       return new Response(JSON.stringify({ playing: false }), { status: 200 });
     }
 
@@ -65,14 +82,7 @@ export const GET: RequestHandler = async () => {
         progressMs,
         durationMs,
         serverTime: Date.now()
-      }), { headers: {
-        'Content-Type': 'application/json',
-        // don't cache this - we want fresh data every time
-        'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'CDN-Cache-Control': 'no-store'
-      } });
+      }), { headers: NO_CACHE_HEADERS });
     }
 
     const recent = await fetchRecent(token);
@@ -87,29 +97,13 @@ export const GET: RequestHandler = async () => {
         progressMs: null,
         durationMs: typeof last.duration_ms === 'number' ? last.duration_ms : null,
         serverTime: Date.now()
-      }), { headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'CDN-Cache-Control': 'no-store'
-      } });
+      }), { headers: NO_CACHE_HEADERS });
     }
 
-    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'CDN-Cache-Control': 'no-store'
-    } });
+    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: NO_CACHE_HEADERS });
   } catch (e) {
-    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'CDN-Cache-Control': 'no-store'
-    } });
+    console.error('spotify now-playing error:', e);
+    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: NO_CACHE_HEADERS });
   }
 };
+
