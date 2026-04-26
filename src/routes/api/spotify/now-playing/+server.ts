@@ -1,51 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
-async function getAccessToken() {
-  const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
-  const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
-  const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
-  const basic = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
-
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: REFRESH_TOKEN ?? ''
-    })
-  });
-
-  if (!res.ok) throw new Error('failed to refresh token');
-  const data = await res.json();
-  return data.access_token as string;
-}
-
-async function fetchNowPlaying(access_token: string) {
-  const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-    headers: { Authorization: `Bearer ${access_token}` }
-  });
-  // 204/202 = nothing playing, 403 = premium required (fall through to recent)
-  if (res.status === 204 || res.status === 202 || res.status === 403) return null;
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`failed to fetch now playing: ${res.status} ${body}`);
-  }
-  return res.json();
-}
-
-async function fetchRecent(access_token: string) {
-  const res = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
-    headers: { Authorization: `Bearer ${access_token}` }
-  });
-  // 403 = premium required
-  if (res.status === 403) return { items: [] };
-  if (!res.ok) throw new Error('failed to fetch recently played');
-  return res.json();
-}
+const LASTFM_API_BASE = 'https://ws.audioscrobbler.com/2.0/';
 
 const NO_CACHE_HEADERS = {
   'Content-Type': 'application/json',
@@ -57,53 +13,47 @@ const NO_CACHE_HEADERS = {
 
 export const GET: RequestHandler = async () => {
   try {
-    const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
-    const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
-    const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
+    const API_KEY = env.LASTFM_API_KEY;
+    const USERNAME = env.LASTFM_USERNAME;
 
-    if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
-      console.log('spotify env vars missing');
+    if (!API_KEY || !USERNAME) {
+      console.log('last.fm env vars missing');
       return new Response(JSON.stringify({ playing: false }), { status: 200 });
     }
 
-    const token = await getAccessToken();
-    const now = await fetchNowPlaying(token);
+    const url = `${LASTFM_API_BASE}?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`;
+    const res = await fetch(url);
 
-    if (now && now.item) {
-      const item = now.item;
-      const progressMs = typeof now.progress_ms === 'number' ? now.progress_ms : null;
-      const durationMs = typeof item.duration_ms === 'number' ? item.duration_ms : null;
-      return new Response(JSON.stringify({
-        playing: now.is_playing ?? false,
-        title: item.name,
-        artist: item.artists?.map((a: any) => a.name).join(', '),
-        url: item.external_urls?.spotify,
-        artwork: item.album?.images?.[1]?.url || item.album?.images?.[0]?.url || null,
-        progressMs,
-        durationMs,
-        serverTime: Date.now()
-      }), { headers: NO_CACHE_HEADERS });
+    if (!res.ok) {
+      throw new Error(`last.fm api error: ${res.status}`);
     }
 
-    const recent = await fetchRecent(token);
-    const last = recent.items?.[0]?.track;
-    if (last) {
-      return new Response(JSON.stringify({
-        playing: false,
-        title: last.name,
-        artist: last.artists?.map((a: any) => a.name).join(', '),
-        url: last.external_urls?.spotify,
-        artwork: last.album?.images?.[1]?.url || last.album?.images?.[0]?.url || null,
-        progressMs: null,
-        durationMs: typeof last.duration_ms === 'number' ? last.duration_ms : null,
-        serverTime: Date.now()
-      }), { headers: NO_CACHE_HEADERS });
+    const data = await res.json();
+    const tracks = data.recenttracks?.track;
+
+    if (!tracks || tracks.length === 0) {
+      return new Response(JSON.stringify({ playing: false }), { status: 200, headers: NO_CACHE_HEADERS });
     }
 
-    return new Response(JSON.stringify({ playing: false }), { status: 200, headers: NO_CACHE_HEADERS });
+    const track = tracks[0];
+    const isNowPlaying = track['@attr']?.nowplaying === 'true';
+    const artwork = track.image?.find((img: any) => img.size === 'large')?.['#text'] 
+                 || track.image?.find((img: any) => img.size === 'medium')?.['#text'] 
+                 || null;
+
+    return new Response(JSON.stringify({
+      playing: isNowPlaying,
+      title: track.name || null,
+      artist: track.artist?.['#text'] || track.artist?.name || null,
+      url: track.url || null,
+      artwork: artwork || null,
+      // last.fm doesn't provide progress/duration, set to null
+      progressMs: null,
+      durationMs: null,
+      serverTime: Date.now()
+    }), { headers: NO_CACHE_HEADERS });
   } catch (e) {
-    console.error('spotify now-playing error:', e);
+    console.error('last.fm now-playing error:', e);
     return new Response(JSON.stringify({ playing: false }), { status: 200, headers: NO_CACHE_HEADERS });
   }
 };
-
