@@ -2,15 +2,8 @@
 	import '../app.css';
 	import favicon from '$lib/assets/v1.png';
 	import NowPlaying from '$lib/NowPlaying.svelte';
-	import { inject } from '@vercel/analytics';
-	import { dev } from '$app/environment';
 
 	let { children } = $props();
-
-	// only track analytics in production
-	if (!dev) {
-		inject();
-	}
 </script>
 
 <svelte:head>

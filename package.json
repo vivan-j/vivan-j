@@ -21,7 +21,7 @@
 		"@eslint/js": "^9.22.0",
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-auto": "^6.0.0",
-		"@sveltejs/adapter-vercel": "^5.10.2",
+		"@sveltejs/adapter-cloudflare": "^6.0.0",
 		"@sveltejs/kit": "^2.22.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@tailwindcss/forms": "^0.5.9",
@@ -46,9 +46,6 @@
 		"vitest-browser-svelte": "^0.1.0"
 	},
 	"dependencies": {
-		"@vercel/analytics": "^1.5.0",
-		"@vercel/kv": "^3.0.0",
-		"gsap": "^3.13.0",
-		"redis": "^5.8.3"
+		"gsap": "^3.13.0"
 	}
 }

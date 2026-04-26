@@ -5,7 +5,7 @@ const CLIENT_ID = env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = env.SPOTIFY_CLIENT_SECRET;
 const REFRESH_TOKEN = env.SPOTIFY_REFRESH_TOKEN;
 
-const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+const basic = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
 
 async function getAccessToken() {
   const res = await fetch('https://accounts.spotify.com/api/token', {
@@ -113,7 +113,3 @@ export const GET: RequestHandler = async () => {
     } });
   }
 };
-
-// Ensure Node runtime on Vercel (not Edge), avoids missing Buffer and subtle caching behavior
-// use node runtime on vercel so we have access to buffer and proper caching
-export const config = { runtime: 'nodejs20.x' } as const;

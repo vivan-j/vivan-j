@@ -1,34 +1,26 @@
 import { json } from '@sveltejs/kit';
-import { createClient } from 'redis';
 import type { RequestHandler } from './$types';
 import { REDIS_URL } from '$env/static/private';
 
-let redis: ReturnType<typeof createClient> | null = null;
-
-async function getRedisClient() {
-  if (!redis) {
-    redis = createClient({ url: REDIS_URL });
-    await redis.connect();
-  }
-  return redis;
-}
+// Cloudflare Workers don't support raw TCP sockets, so the 'redis' npm package won't work.
+// This implementation gracefully returns null for the view count.
+// To restore view counting on Cloudflare, consider:
+// 1. Using Upstash Redis (HTTP-based): https://upstash.com
+// 2. Using Cloudflare KV or D1 for simple counters
 
 export const GET: RequestHandler = async () => {
   try {
-    // need redis to be configured first
     if (!REDIS_URL) {
       console.log('redis not set up');
       return json({ views: null });
     }
 
-    const client = await getRedisClient();
-    
-    // add 1 to the total view count
-    const viewCount = await client.incr('viewCount');
-    return json({ views: viewCount });
+    // TCP-based Redis is not supported on Cloudflare Workers.
+    // Return null until migrated to an HTTP-based solution.
+    console.log('redis view counter disabled on cloudflare workers (tcp not supported)');
+    return json({ views: null });
   } catch (error) {
-    console.error('redis error:', error);
-    // just return null if something goes wrong
+    console.error('analytics error:', error);
     return json({ views: null });
   }
 };
