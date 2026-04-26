@@ -79,8 +79,7 @@
 		{
 			name: 'sharonschools.me',
 			url: 'https://sharonschools.me',
-			description: 'browser games library built for entertainment. no downloads required.',
-			wip: true
+			description: 'browser games library built for entertainment. no downloads required.'
 		},
 		{
 			name: 'smth.tech',
